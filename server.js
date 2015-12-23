@@ -3,16 +3,21 @@
  * IO server file
  */
 var express = require('express');
+var swig = require('swig');
+var io = require('socket.io');
 var app = express();
 var port = 8080;
-var swig = require('swig');
 app.set('view engine', 'swig');
 app.engine('html',swig.renderFile);
 app.set('views', __dirname + '/views');
 app.set('view cache', false);
 swig.setDefaults({ cache: false});
-app.get('/',function(req,res){
-   res.render('index.html');
+app.get('/admin',function(req,res){
+   res.render('admin.html');
 });
-app.listen(port);
+var server = app.listen(port);
 console.log('Server listing on port ' +port);
+
+/****************** Socket IO ***********/
+
+io.listen(server);
