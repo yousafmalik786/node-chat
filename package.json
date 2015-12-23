@@ -1,0 +1,11 @@
+{
+  "name": "node-chat",
+  "version": "0.0.1",
+  "description": "Real time web chat",
+  "dependencies": {
+    "socket.io": "latest",
+    "express": "latest",
+    "swig": "latest"
+  },
+  "author": "developer"
+}
