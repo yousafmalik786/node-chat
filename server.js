@@ -4,6 +4,7 @@
  */
 var express = require('express');
 var swig = require('swig');
+var _ = require('underscore');
 var app = express();
 var port = 8080;
 app.set('view engine', 'swig');
@@ -26,15 +27,44 @@ console.log('Server listing on port ' +port);
 
 var io = require('socket.io').listen(server);
 var clients = {}
+var admins = {}
 //on socket connection
 io.on('connection', function (socket) {
-    //get username from client and save against its socket.
-    socket.on('client_username', function (username) {
-        if(typeof clients[username] == 'undefined'){
-            clients[username] = socket;
+    //get email from client and save against its socket.
+    socket.on('client_credentials', function (data) {
+        if(typeof clients[data.email] == 'undefined'){
+            clients[data.email] = socket;
+            socket.emit('welcome', { message: 'Welcome '+data.name});
         }
         console.log(clients);
-    });
 
-    socket.emit('news', { hello: 'world' });
+    });
+    // on client first message
+    socket.on('NewUserMessage',function(data){
+        console.log(data);
+        var replyTo = '';
+        for(var key in clients){
+            if(clients[key] === socket){
+                replyTo = key;
+            }
+        }
+        var response = {replyTo: replyTo,message :data.message}
+        // check if we have admin available
+        if(Object.keys(admins).length !== 0){
+            var adminValues = _.values(admins);
+            var selectedAdmin = adminValues[0];
+            console.log(selectedAdmin);
+            selectedAdmin.emit('NewClient', response);
+        }
+    });
+    // admin side
+    socket.on('admin_credentials', function (data) {
+        //verify admin credentials with database and add add it to admin list
+        if(typeof admins[data.email] == 'undefined'){
+            admins[data.email] = socket;
+            socket.emit('welcome', { message: 'Welcome Admin'});
+        }
+        console.log(admins);
+    });
 });
+

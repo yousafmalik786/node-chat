@@ -3,8 +3,61 @@
 <head lang="en">
   <meta charset="UTF-8">
   <title></title>
+  <script src="/js/socket.io-1.3.7.js"></script>
+  <script src="/js/jquery-2.1.4.min.js"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css" >
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
- It works
+<div class="container">
+
+  <div class="form-signin credentials_div">
+    <h2 class="form-signin-heading">Admin - Login</h2>
+    <label for="inputEmail" class="sr-only">Email address</label>
+    <input type="email" id="inputEmail" class="form-control" placeholder="Email" required autofocus>
+    <label for="inputPassword" class="sr-only">Name</label>
+    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+    <br />
+    <button id="submitbtn" class="btn btn-lg btn-primary btn-block">Enter</button>
+  </div>
+  <div class="chat_area" style="display: none">
+    <h4 class="welcome_user"></h4>
+  </div>
+  <div class="clients_holder">
+    <label>To :</label><label class="replyTo"></label>
+    <div class="messageBody"></div>
+    <input type="text" class="inputMessage" />
+    <button class="sendMsg" value="Send" >Send</button>
+  </div>
+
+</div> <!-- /container -->
 </body>
 </html>
+
+<script>
+  var socket = "";
+  $('#submitbtn').on('click',function(){
+    var inputPassword = $('#inputPassword').val();
+    var inputEmail = $('#inputEmail').val();
+    if(inputPassword == '' || inputEmail == '')return;
+    socket = io.connect('http://localhost:8080');
+    socket.emit('admin_credentials', { email : inputEmail,password :inputPassword });
+    socket.on('welcome', function (data) {
+      $('.clients_holder .toLabel').text(data.replyTo);
+      $('.credentials_div').hide();
+      $('.chat_area').show();
+    });
+    socket.on('NewClient', function (data) {
+      console.log(data);
+      $('.clients_holder .replyTo').text(data.replyTo);
+      $('.messageBody').append(data.message);
+    });
+  });
+
+
+
+  /*socket.on('news', function (data) {
+   console.log(data);
+   });*/
+</script>

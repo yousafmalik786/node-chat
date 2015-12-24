@@ -33,19 +33,24 @@
 </html>
 
 <script>
+  var socket = "";
   $('#submitbtn').on('click',function(){
     var inputName = $('#inputName').val();
     var inputEmail = $('#inputEmail').val();
     if(inputName == '' || inputEmail == '')return;
-    var socket = io.connect('http://localhost:8080');
+    socket = io.connect('http://localhost:8080');
     socket.emit('client_credentials', { name : inputName,email :inputEmail });
     socket.on('welcome', function (data) {
-      $('#welcome_user').text(data);
+      console.log(data);
+      $('.welcome_user').text(data.message);
       $('.credentials_div').hide();
       $('.chat_area').show();
     });
   });
-
+  $('#sendText').on('click',function(){
+     var message = $('#inputText').val();
+     socket.emit('NewUserMessage',{message : message});
+  });
   /*socket.on('news', function (data) {
     console.log(data);
   });*/
